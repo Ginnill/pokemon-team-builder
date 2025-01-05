@@ -33,9 +33,16 @@ const getTypeColor = (type: string): string => {
     dark: "#705746",
     steel: "#B7B7CE",
     fairy: "#D685AD",
+    hp: "#FF5959", // Cor para HP
+    attack: "#F5AC78", // Cor para Attack
+    defense: "#FAE078", // Cor para Defense
+    "special-attack": "#9DB7F5", // Cor para Special Attack
+    "special-defense": "#A7DB8D", // Cor para Special Defense
+    speed: "#FA92B2", // Cor para Speed
   };
-  return typeColors[type] || "#777"; // Retorna uma cor padrão caso o tipo não exista
+  return typeColors[type] || "#777"; // Cor padrão
 };
+
 
 const calculateTypeDefenses = (types: { type: { name: string } }[]) => {
   const typeChart: { [key: string]: { [key: string]: number } } = {
@@ -154,7 +161,6 @@ const calculateTypeDefenses = (types: { type: { name: string } }[]) => {
 
   const defenseChart: { [key: string]: number } = {};
 
-  // Combinar os tipos
   types.forEach(({ type }) => {
     const typeDefenses = typeChart[type.name];
     if (typeDefenses) {
@@ -164,7 +170,6 @@ const calculateTypeDefenses = (types: { type: { name: string } }[]) => {
     }
   });
 
-  // Transformar o resultado em array para exibição
   return Object.entries(defenseChart).map(([type, multiplier]) => ({
     type,
     multiplier,
@@ -224,6 +229,8 @@ const PokemonDetails: React.FC = () => {
 
   const previousId = pokemon.id === 1 ? MAX_POKEMON_ID : pokemon.id - 1;
   const nextId = pokemon.id === MAX_POKEMON_ID ? 1 : pokemon.id + 1;
+  
+  const totalStats = pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0);  
 
   return (
     <div className="max-w-[720px] mx-auto px-5">
@@ -236,7 +243,7 @@ const PokemonDetails: React.FC = () => {
           {formatId(nextId)} &gt;
         </Link>
       </div>
-
+  
       {/* Informações do Pokémon */}
       <div className="bg-gray-100 p-5 rounded-lg mb-5 text-center">
         <h1 className="text-3xl font-bold capitalize">{pokemon.name}</h1>
@@ -246,13 +253,13 @@ const PokemonDetails: React.FC = () => {
           alt={pokemon.name}
           className="w-32 mx-auto border-solid border-[5px] mt-2 border-white rounded-full bg-gray-300"
         />
-
+  
         {/* Tipagem do Pokémon */}
         <div className="flex justify-center space-x-2 mt-3">
           {pokemon.types.map((type) => (
             <span
               key={type.type.name}
-              className={`px-3 py-1 rounded-full text-white text-sm font-semibold capitalize`}
+              className="px-3 py-1 rounded-full text-white text-sm font-semibold capitalize"
               style={{
                 backgroundColor: getTypeColor(type.type.name),
               }}
@@ -262,44 +269,36 @@ const PokemonDetails: React.FC = () => {
           ))}
         </div>
       </div>
-
+  
       {/* Stats */}
       <div className="bg-gray-100 p-5 rounded-lg mb-5 text-center">
         <h2 className="text-xl font-bold mb-3">Stats</h2>
         <ul className="space-y-3">
           {pokemon.stats.map((stat) => (
-            <li
-              key={stat.stat.name}
-              className="flex items-center justify-between"
-            >
-              {/* Nome do Stat */}
-              <span className="capitalize w-1/4 text-left">
-                {stat.stat.name}
+            <li key={stat.stat.name} className="flex items-center justify-between">
+              <span className="capitalize w-1/4 text-left font-bold">
+                {stat.stat.name.replace("-", " ")}
               </span>
-
-              {/* Barra de Progresso */}
               <div className="flex items-center w-3/4">
-                <span className="text-sm text-gray-800 w-10 text-right mr-2">
-                  0
-                </span>
                 <div className="relative w-full h-4 bg-gray-200 rounded-lg">
                   <div
-                    className="absolute top-0 left-0 h-full bg-blue-500 rounded-lg"
-                    style={{ width: `${(stat.base_stat / 255) * 100}%` }}
+                    className="absolute top-0 left-0 h-full rounded-lg"
+                    style={{
+                      width: `${(stat.base_stat / 255) * 100}%`,
+                      backgroundColor: getTypeColor(stat.stat.name),
+                    }}
                   ></div>
                 </div>
-                <span className="text-sm text-gray-700 w-10 text-left ml-2">
-                  255
-                </span>
+                <span className="ml-4 font-bold">{stat.base_stat}</span>
               </div>
-
-              {/* Valor do Stat */}
-              <span className="ml-4 font-bold">{stat.base_stat}</span>
             </li>
           ))}
         </ul>
+        <div className="mt-5 text-lg font-bold">
+          Total Stats: <span className="text-green-600">{totalStats}</span>
+        </div>
       </div>
-
+  
       {/* Informações Adicionais */}
       <div className="bg-gray-100 p-5 rounded-lg mb-5 text-center">
         <h2 className="text-xl font-bold mb-3">Additional Info</h2>
@@ -310,33 +309,31 @@ const PokemonDetails: React.FC = () => {
           <strong>Weight:</strong> {pokemon.weight} hectograms
         </p>
         <p>
-          <strong>Types:</strong>{" "}
-          {pokemon.types.map((type) => type.type.name).join(", ")}
+          <strong>Types:</strong> {pokemon.types.map((type) => type.type.name).join(", ")}
         </p>
         <p>
           <strong>Abilities:</strong>{" "}
           {pokemon.abilities.map((ability) => ability.ability.name).join(", ")}
         </p>
       </div>
-
+  
       {/* Descrição */}
       <div className="bg-gray-100 p-5 rounded-lg mb-5 text-center">
         <h2 className="text-xl font-bold mb-3">Description</h2>
         <p>{description}</p>
       </div>
-
+  
       {/* Type Defenses */}
       <div className="bg-gray-100 p-5 rounded-lg mb-5 text-center">
         <h2 className="text-xl font-bold mb-3">Type Defenses</h2>
         <p className="mb-3 text-sm text-gray-600">
           How much damage this Pokémon takes from each type.
         </p>
-
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {calculateTypeDefenses(pokemon.types).map(({ type, multiplier }) => (
             <div
               key={type}
-              className={`flex flex-col items-center justify-center p-3 rounded-lg text-white font-semibold capitalize`}
+              className="flex flex-col items-center justify-center p-3 rounded-lg text-white font-semibold capitalize"
               style={{
                 backgroundColor: getTypeColor(type),
               }}
@@ -347,26 +344,28 @@ const PokemonDetails: React.FC = () => {
           ))}
         </div>
       </div>
-
+  
       {/* Evoluções */}
       <div className="bg-gray-100 p-5 rounded-lg mb-5 text-center">
         <h2 className="text-xl font-bold mb-3">Evolutions</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {evolutions.map((evo) => (
-            <div key={evo.id} className="text-center">
-              <img
-                src={evo.sprite}
-                alt={evo.name}
-                className="w-20 h-20 mx-auto border-2 border-gray-300 rounded-full"
-              />
-              <p className="capitalize">{evo.name}</p>
-              <p>{formatId(evo.id)}</p>
-              <p className="text-sm text-gray-600">{evo.types.join(", ")}</p>
-            </div>
+            <Link to={`/pokemon/${evo.name}`} key={evo.id}>
+              <div className="text-center">
+                <img
+                  src={evo.sprite}
+                  alt={evo.name}
+                  className="w-20 h-20 mx-auto border-2 border-gray-300 hover:bg-white transition-colors rounded-full"
+                />
+                <p className="capitalize">{evo.name}</p>
+                <p>{formatId(evo.id)}</p>
+                <p className="text-sm text-gray-600">{evo.types.join(", ")}</p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
-
+  
       {/* CTA */}
       <div className="text-center my-10">
         <Link
@@ -378,6 +377,7 @@ const PokemonDetails: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default PokemonDetails;
+  };
+  
+  export default PokemonDetails;
+  
