@@ -1,50 +1,63 @@
-# React + TypeScript + Vite
+# Pokémon Team Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web application to explore detailed information about Pokémon, build teams, and visualize weaknesses, resistances, and evolutions.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Features
 
-## Expanding the ESLint configuration
+- 🔍 **Search Pokémon**: Search for Pokémon by name.
+- 🌀 **Filter by Types**: Filter Pokémon by up to two types simultaneously.
+- 📊 **Pokémon Details**:
+  - Types displayed with representative colors.
+  - Pokédex number formatted as `Nº 0001`.
+  - Stats displayed with bar graphs.
+  - Weaknesses and resistances with damage multipliers.
+  - Evolution chains with images and types.
+- 📱 **Responsive Design**: Adapted for desktop, tablet, and mobile devices.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+---
 
-- Configure the top-level `parserOptions` property like this:
+## 🧰 Technologies Used
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Frontend**:
+  - [React](https://reactjs.org/)
+  - [TypeScript](https://www.typescriptlang.org/)
+  - [Vite](https://vitejs.dev/)
+- **Styling**:
+  - [TailwindCSS](https://tailwindcss.com/)
+  - SCSS
+- **Libraries**:
+  - [React Router](https://reactrouter.com/) (for navigation)
+  - [Axios](https://axios-http.com/) (for API requests)
+- **Data Source**:
+  - [PokéAPI](https://pokeapi.co/)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+---
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## 📦 Installation
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+### **Prerequisites**
+
+- [Node.js](https://nodejs.org/) (version 16 or higher)
+- [Git](https://git-scm.com/)
+
+### **Steps**
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Ginnill/pokemon-team-builder.git
+   cd pokemon-team-builder
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+
+3. **Start the Development Server**
+   ```bash
+   npm run dev
+    
+4. **The app will be available at:**
+   ```bash
+   http://localhost:5173
+
