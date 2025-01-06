@@ -2,13 +2,16 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import PokemonDetails from "./pages/PokemonDetails";
+import ScrollToTopWrapper from "./components/ScrollToTopWrapper";
 
 const App: React.FC = () => (
   <Router basename="/pokemon-team-builder">
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/pokemon/:name" element={<PokemonDetails />} />
-    </Routes>
+    <ScrollToTopWrapper>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/pokemon/:name" element={<PokemonDetails />} />
+      </Routes>
+    </ScrollToTopWrapper>
   </Router>
 );
 
