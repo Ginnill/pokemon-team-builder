@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getPokemonDetails, getPokemonSpecies } from "../api/pokeApi";
+import { usePokemonContext } from "../context/PokemonContext"; // use o contexto!
 
 interface PokemonDetailsProps {
   name: string;
@@ -178,23 +178,24 @@ const calculateTypeDefenses = (types: { type: { name: string } }[]) => {
 
 const PokemonDetails: React.FC = () => {
   const { name } = useParams<{ name: string }>();
+  const { getDetails, getSpecies } = usePokemonContext(); // use funções do contexto
+
   const [pokemon, setPokemon] = useState<PokemonDetailsProps | null>(null);
   const [description, setDescription] = useState<string>("");
   const [evolutions, setEvolutions] = useState<any[]>([]);
 
-  const MAX_POKEMON_ID = 1025; // Último ID conhecido
-  const formatId = (id: number) => `Nº ${String(id).padStart(4, "0")}`; // Formatar com 4 dígitos
+  const MAX_POKEMON_ID = 1025;
+  const formatId = (id: number) => `Nº ${String(id).padStart(4, "0")}`;
 
   useEffect(() => {
     if (name) {
-      getPokemonDetails(name).then(setPokemon);
-      getPokemonSpecies(name).then((data) => {
+      getDetails(name).then(setPokemon); // usa cache/contexto
+      getSpecies(name).then((data) => {
         const englishEntry = data.flavor_text_entries.find(
           (entry: any) => entry.language.name === "en"
         );
         setDescription(englishEntry?.flavor_text || "");
 
-        // Obter cadeia evolutiva
         fetch(data.evolution_chain.url)
           .then((res) => res.json())
           .then((evolutionData) => {
@@ -211,19 +212,19 @@ const PokemonDetails: React.FC = () => {
 
             Promise.all(
               evolutionChain.map(async (evo) => {
-                const details = await getPokemonDetails(evo.name);
+                const details = await getDetails(evo.name); // usa cache/contexto
                 return {
                   name: evo.name,
                   id: details.id,
                   sprite: details.sprites.front_default,
-                  types: details.types.map((type) => type.type.name),
+                  types: details.types.map(({type}:any) => type.name),
                 };
               })
             ).then(setEvolutions);
           });
       });
     }
-  }, [name]);
+  }, [name, getDetails, getSpecies]);
 
   if (!pokemon) return <p>Loading...</p>;
 
@@ -234,6 +235,15 @@ const PokemonDetails: React.FC = () => {
 
   return (
     <div className="max-w-[720px] mx-auto px-5">
+      {/* CTA */}
+      <div className="text-center my-10">
+        <Link
+          to="/"
+          className="text-white py-2 px-10 bg-orange-500 hover:bg-orange-600 transition-colors rounded-md"
+        >
+          Back to Home
+        </Link>
+      </div>
       {/* Navegação */}
       <div className="grid grid-cols-2 gap-5 mb-5 text-center py-3 bg-gray-900 rounded-md mt-5">
         <Link to={`/pokemon/${previousId}`} className="text-white">
@@ -377,7 +387,6 @@ const PokemonDetails: React.FC = () => {
       </div>
     </div>
   );
-  };
-  
-  export default PokemonDetails;
-  
+};
+
+export default PokemonDetails;

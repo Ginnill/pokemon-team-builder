@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPokemonList, getPokemonDetails } from "../api/pokeApi";
+import { usePokemonContext } from "../context/PokemonContext"; // troque pelo contexto!
 import PokemonCard from "../components/PokemonCard";
 
 const Home: React.FC = () => {
@@ -16,15 +16,16 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true); // Estado para carregar
   const navigate = useNavigate();
 
-  // Buscar a lista de Pokémon
+  const { getList, getDetails } = usePokemonContext(); // use o contexto
+
   useEffect(() => {
     const fetchPokemons = async () => {
-      setLoading(true); // Ativar carregamento
+      setLoading(true);
       try {
-        const list = await getPokemonList();
+        const list = await getList(); // usa o cache do contexto
         const fetchedPokemons = await Promise.all(
           list.map(async (pokemon: { name: string }) => {
-            const details = await getPokemonDetails(pokemon.name);
+            const details = await getDetails(pokemon.name); // usa o cache do contexto
             const statsSum = details.stats.reduce((acc: number, stat: any) => acc + stat.base_stat, 0);
             return {
               name: pokemon.name,
@@ -39,7 +40,7 @@ const Home: React.FC = () => {
       } catch (error) {
         console.error("Erro ao carregar Pokémon:", error);
       } finally {
-        setLoading(false); // Desativar carregamento
+        setLoading(false);
       }
     };
 
@@ -51,25 +52,27 @@ const Home: React.FC = () => {
       .then((data) => {
         const types = data.results
           .map((type: { name: string }) => type.name)
-          .filter((type) => type !== "unknown" && type !== "stellar");
+          .filter((type: any) => type !== "unknown" && type !== "stellar");
         setAllTypes(types);
       });
   }, []);
 
-  const filteredPokemons = pokemons
-    .filter((pokemon) => {
-      const matchesSearch = pokemon.name.toLowerCase().includes(search.toLowerCase());
-      const matchesType1 = selectedType1 === "Pokemon Type 1" || pokemon.types.includes(selectedType1);
-      const matchesType2 = selectedType2 === "Pokemon Type 2" || pokemon.types.includes(selectedType2);
-      return matchesSearch && matchesType1 && matchesType2;
-    })
-    .sort((a, b) => {
-      if (sortCriteria === "name") {
-        return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-      } else {
-        return sortOrder === "asc" ? a.id - b.id : b.id - a.id;
-      }
-    });
+  const filteredPokemons = useMemo(() => {
+    return pokemons
+      .filter((pokemon) => {
+        const matchesSearch = pokemon.name.toLowerCase().includes(search.toLowerCase());
+        const matchesType1 = selectedType1 === "Pokemon Type 1" || pokemon.types.includes(selectedType1);
+        const matchesType2 = selectedType2 === "Pokemon Type 2" || pokemon.types.includes(selectedType2);
+        return matchesSearch && matchesType1 && matchesType2;
+      })
+      .sort((a, b) => {
+        if (sortCriteria === "name") {
+          return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        } else {
+          return sortOrder === "asc" ? a.id - b.id : b.id - a.id;
+        }
+      });
+  }, [pokemons, search, selectedType1, selectedType2, sortOrder, sortCriteria]);
 
   return (
     <div className="max-w-[1160px] mx-auto px-5 mt-5">
