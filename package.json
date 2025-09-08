@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "homepage": "https://ginnill.github.io/pokemon-team-builder",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

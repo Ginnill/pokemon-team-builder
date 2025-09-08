@@ -7,7 +7,7 @@ import { PokemonProvider } from "./context/PokemonContext"; // importe o provide
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => (
-  <Router basename="/pokemon-team-builder">
+  <Router>
     <PokemonProvider>
       <ScrollToTopWrapper>
         <Routes>
